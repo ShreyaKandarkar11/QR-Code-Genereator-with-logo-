@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - QR Code Generator Pro{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow">
+            <div class="card-header text-center">
+                <h3 class="mb-0">
+                    <i class="bi bi-person-circle"></i> User Profile
+                </h3>
+            </div>
+            <div class="card-body p-5">
+                <div class="row">
+                    <div class="col-md-4 text-center mb-4 mb-md-0">
+                        <div class="profile-avatar mb-3">
+                            <i class="bi bi-person-circle display-1 text-primary"></i>
+                        </div>
+                        <h4 class="mb-1">{{ user.username }}</h4>
+                        <p class="text-muted">Member since {{ user.created_at.strftime('%B %Y') }}</p>
+                    </div>
+                    
+                    <div class="col-md-8">
+                        <h5 class="mb-3">Account Information</h5>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Username</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                <input type="text" class="form-control" value="{{ user.username }}" readonly>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Email Address</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                                <input type="email" class="form-control" value="{{ user.email }}" readonly>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Account Status</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-shield-check"></i></span>
+                                <input type="text" class="form-control" value="Active" readonly>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Member Since</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-calendar"></i></span>
+                                <input type="text" class="form-control" value="{{ user.created_at.strftime('%B %d, %Y') }}" readonly>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            <a href="{{ url_for('dashboard') }}" class="btn btn-primary">
+                                <i class="bi bi-speedometer2"></i> Go to Dashboard
+                            </a>
+                            <button class="btn btn-outline-secondary" onclick="window.print()">
+                                <i class="bi bi-printer"></i> Print Profile
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <hr class="my-4">
+                
+                <h5 class="mb-3">Account Statistics</h5>
+                <div class="row text-center">
+                    <div class="col-4">
+                        <div class="stat-card">
+                            <div class="stat-icon text-primary">
+                                <i class="bi bi-qr-code"></i>
+                            </div>
+                            <div class="stat-number">{{ user.qr_codes|length }}</div>
+                            <div class="stat-label">QR Codes</div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="stat-card">
+                            <div class="stat-icon text-success">
+                                <i class="bi bi-calendar"></i>
+                            </div>
+                            <div class="stat-number">{{ (user.created_at.date() | today() | days_difference) }}</div>
+                            <div class="stat-label">Days Active</div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="stat-card">
+                            <div class="stat-icon text-info">
+                                <i class="bi bi-clock"></i>
+                            </div>
+                            <div class="stat-number">{{ user.created_at.strftime('%b %d') }}</div>
+                            <div class="stat-label">Joined Date</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.profile-avatar {
+    display: inline-block;
+    padding: 20px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    border-radius: 50%;
+    color: white;
+}
+
+.stat-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+@media print {
+    .navbar, footer, .btn {
+        display: none !important;
+    }
+    
+    .card {
+        box-shadow: none !important;
+        border: 1px solid #dee2e6;
+    }
+}
+</style>
+{% endblock %}

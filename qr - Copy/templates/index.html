@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Home - QR Code Generator Pro{% endblock %}
+
+{% block content %}
+<div class="row align-items-center min-vh-100">
+    <div class="col-lg-6">
+        <div class="hero-content">
+            <h1 class="display-4 fw-bold text-primary mb-4">
+                Professional QR Code Generator
+            </h1>
+            <p class="lead mb-4">
+                Create, manage, and track QR codes with our powerful web application. 
+                Perfect for businesses, marketing campaigns, and personal use.
+            </p>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                {% if not current_user.is_authenticated %}
+                    <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg px-4 me-md-2">
+                        <i class="bi bi-person-plus"></i> Get Started Free
+                    </a>
+                    <a href="{{ url_for('login') }}" class="btn btn-outline-primary btn-lg px-4">
+                        <i class="bi bi-box-arrow-in-right"></i> Login
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg px-4 me-md-2">
+                        <i class="bi bi-speedometer2"></i> Go to Dashboard
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="text-center">
+            <div class="qr-preview-card">
+                <div class="card shadow-lg">
+                    <div class="card-body p-5">
+                        <div class="qr-placeholder mb-4">
+                            <i class="bi bi-qr-code-scan display-1 text-primary"></i>
+                        </div>
+                        <h5 class="card-title">Sample QR Code</h5>
+                        <p class="card-text text-muted">
+                            Generate unlimited QR codes with custom content, colors, and tracking
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Features Section -->
+<section class="py-5">
+    <div class="row text-center">
+        <div class="col-lg-4 mb-4">
+            <div class="feature-icon mb-3">
+                <i class="bi bi-lightning-fill text-primary fs-1"></i>
+            </div>
+            <h4>Fast Generation</h4>
+            <p class="text-muted">Generate QR codes instantly with our optimized algorithms</p>
+        </div>
+        <div class="col-lg-4 mb-4">
+            <div class="feature-icon mb-3">
+                <i class="bi bi-shield-check text-success fs-1"></i>
+            </div>
+            <h4>Secure & Private</h4>
+            <p class="text-muted">Your data is encrypted and stored securely in our database</p>
+        </div>
+        <div class="col-lg-4 mb-4">
+            <div class="feature-icon mb-3">
+                <i class="bi bi-graph-up text-info fs-1"></i>
+            </div>
+            <h4>Track Analytics</h4>
+            <p class="text-muted">Monitor QR code usage and performance with detailed analytics</p>
+        </div>
+    </div>
+</section>
+{% endblock %}

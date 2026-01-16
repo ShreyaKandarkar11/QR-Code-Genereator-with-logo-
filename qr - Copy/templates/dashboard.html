@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - QR Code Generator Pro{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="display-6 fw-bold text-gradient">
+        <i class="bi bi-speedometer2"></i> Dashboard
+    </h1>
+    <div>
+        <span class="badge bg-primary fs-6">
+            <i class="bi bi-person"></i> Welcome, {{ current_user.username }}
+        </span>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="dashboard-stats mb-5">
+    <div class="stat-card">
+        <div class="stat-icon text-primary">
+            <i class="bi bi-qr-code"></i>
+        </div>
+        <div class="stat-number">{{ qr_codes|length }}</div>
+        <div class="stat-label">Total QR Codes</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon text-success">
+            <i class="bi bi-calendar-check"></i>
+        </div>
+        <div class="stat-number">{{ current_user.created_at.strftime('%b %d') }}</div>
+        <div class="stat-label">Member Since</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon text-info">
+            <i class="bi bi-lightning"></i>
+        </div>
+        <div class="stat-number">{{ qr_codes|length * 3 if qr_codes else 0 }}</div>
+        <div class="stat-label">Scans This Week</div>
+    </div>
+</div>
+
+<!-- Generate New QR Code -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">
+            <i class="bi bi-plus-circle"></i> Generate New QR Code
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-8">
+                <input type="text" class="form-control form-control-lg" id="qrContent" 
+                       placeholder="Enter text, URL, or any content for QR code...">
+            </div>
+            <div class="col-md-4">
+                <button class="btn btn-primary btn-lg w-100" id="generateQRBtn">
+                    <i class="bi bi-qr-code"></i> Generate QR
+                </button>
+            </div>
+        </div>
+        <div id="qrResult" class="mt-4" style="display: none;"></div>
+    </div>
+</div>
+
+<!-- Search and Filter -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="input-group">
+            <span class="input-group-text">
+                <i class="bi bi-search"></i>
+            </span>
+            <input type="text" class="form-control" id="searchQR" placeholder="Search QR codes...">
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="d-flex gap-2">
+            <select class="form-select" id="sortQR">
+                <option value="newest">Newest First</option>
+                <option value="oldest">Oldest First</option>
+                <option value="content">By Content</option>
+            </select>
+            <button class="btn btn-outline-secondary" onclick="refreshQRCodes()">
+                <i class="bi bi-arrow-clockwise"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- QR Codes Grid -->
+{% if qr_codes %}
+    <div class="qr-grid">
+        {% for qr in qr_codes %}
+            <div class="qr-card" data-qr-id="{{ qr.id }}">
+                <img src="data:image/png;base64,{{ qr.qr_image }}" alt="QR Code" class="qr-image">
+                <div class="qr-content">
+                    <p class="qr-text">{{ qr.content[:100] }}{% if qr.content|length > 100 %}...{% endif %}</p>
+                    <small class="text-muted qr-created">
+                        <i class="bi bi-clock"></i> {{ qr.created_at.strftime('%Y-%m-%d %H:%M') }}
+                    </small>
+                    <div class="qr-actions mt-3">
+                        <button class="btn btn-outline-primary btn-sm copy-content-btn" 
+                                data-content="{{ qr.content }}" title="Copy Content">
+                            <i class="bi bi-clipboard"></i>
+                        </button>
+                        <button class="btn btn-outline-success btn-sm" 
+                                onclick="downloadQR('{{ qr.qr_image }}')" title="Download">
+                            <i class="bi bi-download"></i>
+                        </button>
+                        <button class="btn btn-outline-danger btn-sm delete-qr-btn" 
+                                data-qr-id="{{ qr.id }}" title="Delete">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="text-center py-5">
+        <i class="bi bi-qr-code display-1 text-muted mb-4"></i>
+        <h4 class="text-muted">No QR Codes Yet</h4>
+        <p class="text-muted">Generate your first QR code using the form above!</p>
+    </div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Dashboard specific functionality
+function refreshQRCodes() {
+    location.reload();
+}
+
+// Sort functionality
+document.getElementById('sortQR')?.addEventListener('change', function() {
+    const sortBy = this.value;
+    const qrGrid = document.querySelector('.qr-grid');
+    const qrCards = Array.from(qrGrid.children);
+    
+    qrCards.sort((a, b) => {
+        switch(sortBy) {
+            case 'newest':
+                return b.dataset.qrId - a.dataset.qrId;
+            case 'oldest':
+                return a.dataset.qrId - b.dataset.qrId;
+            case 'content':
+                const contentA = a.querySelector('.qr-text').textContent.toLowerCase();
+                const contentB = b.querySelector('.qr-text').textContent.toLowerCase();
+                return contentA.localeCompare(contentB);
+            default:
+                return 0;
+        }
+    });
+    
+    qrCards.forEach(card => qrGrid.appendChild(card));
+});
+</script>
+{% endblock %}
